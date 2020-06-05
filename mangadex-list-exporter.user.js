@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Mangadex List Exporter
 // @namespace    https://github.com/MarvNC
-// @version      0.13
+// @version      0.14
 // @description  A userscript for exporting a MangaDex list to a .xml file for import to anime list sites.
 // @author       Marv
 // @match        https://mangadex.org/list*
@@ -68,10 +68,16 @@ Last updated june 2020
 	</myinfo>
 
 `;
+    // create timer counting down to remaining time
+    let countdownTimer = document.createElement('p');
+    countdownTimer.style = 'text-align:center;';
+    btn.parentElement.appendChild(countdownTimer);
 
     // loop through each manga ID in IDs
     for (let i = 0; i < IDs.length; i++) {
       console.log(`${i + 1} of ${IDs.length}: Getting details for manga ID: ${IDs[i]}`);
+      // update time remaining, accounting for different delays
+      countdownTimer.innerHTML = `Export time remaining: ${formatSeconds((IDs.length - i + 1) * DELAY / 1000)}`;
       // get the info from the manga then add it to xml
       getMangaInfo(IDs[i]).then((mangaInfo) => {
         btn.innerHTML = `${i + 1} of ${IDs.length} entries: Retrieved data for ${
@@ -203,4 +209,9 @@ var getMangaInfo = (id) => {
 // Returns a Promise that resolves after "ms" Milliseconds
 var timer = (ms) => {
   return new Promise((res) => setTimeout(res, ms));
+};
+
+// seconds to HH:MM:SS
+var formatSeconds = (seconds) => {
+  return new Date(seconds * 1000).toISOString().substr(11, 8);
 };
