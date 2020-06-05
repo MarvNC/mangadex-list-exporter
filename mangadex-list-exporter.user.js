@@ -77,7 +77,7 @@ Last updated june 2020
     for (let i = 0; i < IDs.length; i++) {
       console.log(`${i + 1} of ${IDs.length}: Getting details for manga ID: ${IDs[i]}`);
       // update time remaining, accounting for different delays
-      countdownTimer.innerHTML = `Export time remaining: ${formatSeconds((IDs.length - i + 1) * DELAY / 1000)}`;
+      countdownTimer.innerHTML = `Export time remaining: ${formatSeconds((IDs.length - i - 1) * DELAY / 1000)}`;
       // get the info from the manga then add it to xml
       getMangaInfo(IDs[i]).then((mangaInfo) => {
         btn.innerHTML = `${i + 1} of ${IDs.length} entries: Retrieved data for ${
