@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Mangadex List Exporter
 // @namespace    https://github.com/MarvNC
-// @version      0.11
+// @version      0.12
 // @description  A userscript for exporting a MangaDex list to a .xml file for import to anime list sites.
 // @author       Marv
 // @match        https://mangadex.org/list*
@@ -12,12 +12,13 @@
 // @grant        none
 // ==/UserScript==
 
+// 1000ms delay between requests for MangaDex
+const DELAY = 1000;
+
 (function () {
   'use strict';
 
   let save = () => {
-    // 1000ms delay between requests for MangaDex
-    const DELAY = 1000;
 
     // accepts url of a manga that is on your manga list
     var getMangaInfo = (id) => {
@@ -27,13 +28,12 @@
         let doc = document.createElement('html');
         doc.innerHTML = response;
         // the part with status and rating
-        let actions = Array.from(
-          doc.getElementsByClassName('col-lg-3 col-xl-2 strong')
-        ).find((elem) => elem.innerHTML == 'Actions:');
+        let actions = Array.from(doc.getElementsByClassName('col-lg-3 col-xl-2 strong')).find(
+          (elem) => elem.innerHTML == 'Actions:'
+        );
         let buttons = actions.parentElement.childNodes[3];
         let status =
-          actions.parentElement.childNodes[3].childNodes[3].childNodes[0]
-            .childNodes[2].innerHTML;
+          actions.parentElement.childNodes[3].childNodes[3].childNodes[0].childNodes[2].innerHTML;
         let rating = Number.parseInt(
           buttons.childNodes[5].childNodes[1].innerText.replace(' ', '')
         );
@@ -41,16 +41,12 @@
         if (!rating) rating = 0;
 
         // reading info
-        let readinginfo = Array.from(
-          doc.getElementsByClassName('col-lg-3 col-xl-2 strong')
-        ).find((elem) => elem.innerHTML == 'Reading progress:');
+        let readinginfo = Array.from(doc.getElementsByClassName('col-lg-3 col-xl-2 strong')).find(
+          (elem) => elem.innerHTML == 'Reading progress:'
+        );
         let ratings = readinginfo.parentElement.childNodes[3].childNodes[1];
-        let volume = Number.parseInt(
-          ratings.childNodes[1].childNodes[1].innerHTML
-        );
-        let chapter = Number.parseInt(
-          ratings.childNodes[3].childNodes[1].innerHTML
-        );
+        let volume = Number.parseInt(ratings.childNodes[1].childNodes[1].innerHTML);
+        let chapter = Number.parseInt(ratings.childNodes[3].childNodes[1].innerHTML);
 
         // get IDs of various DBs etc.
         let alID = 0,
@@ -58,21 +54,19 @@
           kitsuID = 0,
           muID = 0,
           apSlug = 0;
-        let extLinks = Array.from(
-          doc.getElementsByClassName('col-lg-3 col-xl-2 strong')
-        ).find((elem) => elem.innerHTML == 'Information:');
+        let extLinks = Array.from(doc.getElementsByClassName('col-lg-3 col-xl-2 strong')).find(
+          (elem) => elem.innerHTML == 'Information:'
+        );
         if (extLinks) {
           let links = extLinks.parentElement.childNodes[3].childNodes[0];
           let result = Array.from(links.childNodes).find((elem) => {
-            if (elem.childNodes[2])
-              return elem.childNodes[2].innerHTML == 'AniList';
+            if (elem.childNodes[2]) return elem.childNodes[2].innerHTML == 'AniList';
           });
           // name: name of the link to find, regex: the regex expression to get desired ID or slug
           let getLink = (name, regex) => {
             try {
               let link = Array.from(links.childNodes).find((elem) => {
-                if (elem.childNodes[2])
-                  return elem.childNodes[2].innerHTML == name;
+                if (elem.childNodes[2]) return elem.childNodes[2].innerHTML == name;
               }).childNodes[2].href;
               let result = regex.exec(link);
               // return result, or return 0 if no result
@@ -90,9 +84,8 @@
         }
 
         let mdID = id;
-        let mangaTitle = doc.getElementsByClassName(
-          'card-header d-flex align-items-center py-2'
-        )[0].childNodes[3].innerHTML;
+        let mangaTitle = doc.getElementsByClassName('card-header d-flex align-items-center py-2')[0]
+          .childNodes[3].innerHTML;
 
         resolve({
           mangaTitle: mangaTitle,
@@ -134,16 +127,15 @@
       // loop through each page of 100 mangas on list
       for (let i = 1; i <= pages; i++) {
         console.log(`Getting page ${i} of ${pages} pages`);
+        btn.innerHTML = `Getting page ${i} of ${pages} list pages`;
         let response = await $.get(urlPrefix + i);
         let doc = document.createElement('html');
         doc.innerHTML = response;
         await timer(DELAY);
         // get the manga IDs on each page
-        doc
-          .getElementsByClassName('container')[1]
-          .childNodes.forEach((node) => {
-            if (node.dataset && node.dataset.id) IDs.push(node.dataset.id);
-          });
+        doc.getElementsByClassName('container')[1].childNodes.forEach((node) => {
+          if (node.dataset && node.dataset.id) IDs.push(node.dataset.id);
+        });
       }
       console.log(IDs);
       // prettier-ignore
@@ -151,7 +143,7 @@
 `<?xml version="1.0" encoding="UTF-8" ?>
 	
 	<!--
-	Created by Mangadex XML List Export userscript
+	Created by Mangadex List Export userscript
 	Programmed by Marv
 	Last updated june 2020
 	-->
@@ -165,11 +157,10 @@
 `;
       // loop through each manga ID in IDs
       for (let i = 0; i < IDs.length; i++) {
-        console.log(
-          `${i + 1} of ${IDs.length}: Getting details for manga ID: ${IDs[i]}`
-        );
+        console.log(`${i + 1} of ${IDs.length}: Getting details for manga ID: ${IDs[i]}`);
         // get the info from the manga then add it to xml
         getMangaInfo(IDs[i]).then((mangaInfo) => {
+          btn.innerHTML = `${i + 1} of ${IDs.length} entries: Retrieved data for ${mangaInfo.mangaTitle}`;
           // prettier-ignore
           xml += 
 `				<manga>
@@ -207,7 +198,7 @@
   var btn = document.createElement('BUTTON');
   btn.innerHTML = 'Export List';
   btn.onclick = save;
-  document.getElementsByClassName('card mb-3')[0].prepend(btn);
+  document.getElementsByClassName('card mb-3')[0].append(btn);
 
   // Your code here...
 })();
