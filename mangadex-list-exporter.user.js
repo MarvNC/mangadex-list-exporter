@@ -75,9 +75,8 @@
                   return elem.childNodes[2].innerHTML == name;
               }).childNodes[2].href;
               let result = regex.exec(link);
-              // return result, return 0 otherwise
-              result = result ? result[0] : 0;
-              return result;
+              // return result, or return 0 if no result
+              return result ? result[0] : 0;
             } catch (err) {
               return 0;
             }
