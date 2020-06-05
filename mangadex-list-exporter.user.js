@@ -109,6 +109,7 @@ const DELAY = 1000;
 
     // the main program with stuff to do
     (async () => {
+      // disable the button
       btn.onclick = null;
       // get amount of titles (ex. 'Showing 1 to 100 of 420 titles')
       let titleCountElem = document.getElementsByClassName('mt-3 text-center');
@@ -186,20 +187,20 @@ const DELAY = 1000;
       }
       xml += `		</myanimelist>`;
       btn.innerHTML = `Completed list export of ${IDs.length} entries!`
+      // save the xml string as an xml with current date as filename
       let date = new Date();
       let filename = `mangalist_${date.toISOString()}.xml`;
       let blob = new Blob([xml], {
         type: 'application/xml',
       });
-      console.log('saving');
       saveAs(blob, filename);
     })();
   };
 
+  // the button to add
   var btn = document.createElement('BUTTON');
-  btn.innerHTML = 'Export List';
+  btn.innerHTML = `Click to export list; remember to set view mode to 'Simple list'`;
   btn.onclick = save;
+  // add the button after user banner
   document.getElementsByClassName('card mb-3')[0].append(btn);
-
-  // Your code here...
 })();
