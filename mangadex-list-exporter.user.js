@@ -115,8 +115,8 @@ const DELAY = 1000;
       let titleCountElem = document.getElementsByClassName('mt-3 text-center');
       let pages = 1;
       if (titleCountElem[0]) {
-        pages = /(?<= of )\d+(?= titles)/.exec(titleCountElem[0].innerHTML)[0];
-        pages = Math.ceil(pages / 100);
+        pages = /(?<= of )[0-9,]+(?= titles)/.exec(titleCountElem[0].innerHTML)[0];
+        pages = Math.ceil(Number(pages.replace(',', '')) / 100);
       }
       // url without the /chapters/2/ or whatever
       let userID = /(?<=\/list\/)\d+/.exec(document.URL)[0];
@@ -161,7 +161,9 @@ const DELAY = 1000;
         console.log(`${i + 1} of ${IDs.length}: Getting details for manga ID: ${IDs[i]}`);
         // get the info from the manga then add it to xml
         getMangaInfo(IDs[i]).then((mangaInfo) => {
-          btn.innerHTML = `${i + 1} of ${IDs.length} entries: Retrieved data for ${mangaInfo.mangaTitle}`;
+          btn.innerHTML = `${i + 1} of ${IDs.length} entries: Retrieved data for ${
+            mangaInfo.mangaTitle
+          }`;
           // prettier-ignore
           xml += 
 `				<manga>
@@ -186,7 +188,7 @@ const DELAY = 1000;
         await timer(DELAY);
       }
       xml += `		</myanimelist>`;
-      btn.innerHTML = `Completed list export of ${IDs.length} entries!`
+      btn.innerHTML = `Completed list export of ${IDs.length} entries!`;
       // save the xml string as an xml with current date as filename
       let date = new Date();
       let filename = `mangalist_${date.toISOString()}.xml`;
