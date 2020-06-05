@@ -19,7 +19,6 @@ const DELAY = 1000;
   'use strict';
 
   let save = () => {
-
     // accepts url of a manga that is on your manga list
     var getMangaInfo = (id) => {
       return new Promise(async (resolve, reject) => {
@@ -110,6 +109,7 @@ const DELAY = 1000;
 
     // the main program with stuff to do
     (async () => {
+      btn.onclick = null;
       // get amount of titles (ex. 'Showing 1 to 100 of 420 titles')
       let titleCountElem = document.getElementsByClassName('mt-3 text-center');
       let pages = 1;
@@ -185,6 +185,7 @@ const DELAY = 1000;
         await timer(DELAY);
       }
       xml += `		</myanimelist>`;
+      btn.innerHTML = `Completed list export of ${IDs.length} entries!`
       let date = new Date();
       let filename = `mangalist_${date.toISOString()}.xml`;
       let blob = new Blob([xml], {
