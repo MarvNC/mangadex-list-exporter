@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Mangadex List Exporter
 // @namespace    https://github.com/MarvNC
-// @version      0.14
+// @version      0.15
 // @description  A userscript for exporting a MangaDex list to a .xml file for import to anime list sites.
 // @author       Marv
 // @match        https://mangadex.org/list*
@@ -77,7 +77,9 @@ Last updated june 2020
     for (let i = 0; i < IDs.length; i++) {
       console.log(`${i + 1} of ${IDs.length}: Getting details for manga ID: ${IDs[i]}`);
       // update time remaining, accounting for different delays
-      countdownTimer.innerHTML = `Export time remaining: ${formatSeconds((IDs.length - i - 1) * DELAY / 1000)}`;
+      countdownTimer.innerHTML = `Export time remaining: ${formatSeconds(
+        ((IDs.length - i - 1) * DELAY) / 1000
+      )}`;
       // get the info from the manga then add it to xml
       getMangaInfo(IDs[i]).then((mangaInfo) => {
         btn.innerHTML = `${i + 1} of ${IDs.length} entries: Retrieved data for ${
@@ -162,9 +164,6 @@ var getMangaInfo = (id) => {
     );
     if (extLinks) {
       let links = extLinks.parentElement.childNodes[3].childNodes[0];
-      let result = Array.from(links.childNodes).find((elem) => {
-        if (elem.childNodes[2]) return elem.childNodes[2].innerHTML == 'AniList';
-      });
       // name: name of the link to find, regex: the regex expression to get desired ID or slug
       let getLink = (name, regex) => {
         try {
