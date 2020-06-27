@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Mangadex List Exporter
 // @namespace    https://github.com/MarvNC
-// @version      0.15
+// @version      0.16
 // @description  A userscript for exporting a MangaDex list to a .xml file for import to anime list sites.
 // @author       Marv
 // @match        https://mangadex.org/list*
@@ -48,6 +48,7 @@ const DELAY = 1000;
       doc.getElementsByClassName('container')[1].childNodes.forEach((node) => {
         if (node.dataset && node.dataset.id) IDs.push(node.dataset.id);
       });
+      doc.remove();
     }
 
     console.log(IDs);
@@ -188,6 +189,8 @@ var getMangaInfo = (id) => {
     let mdID = id;
     let mangaTitle = doc.getElementsByClassName('card-header d-flex align-items-center py-2')[0]
       .childNodes[3].innerHTML;
+
+    response.remove();
 
     resolve({
       mangaTitle: mangaTitle,
