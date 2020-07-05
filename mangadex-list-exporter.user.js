@@ -190,7 +190,7 @@ var getMangaInfo = (id) => {
     let mangaTitle = doc.getElementsByClassName('card-header d-flex align-items-center py-2')[0]
       .childNodes[3].innerHTML;
 
-    response.remove();
+    $(response).remove();
 
     resolve({
       mangaTitle: mangaTitle,
