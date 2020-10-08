@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Mangadex List Exporter
 // @namespace    https://github.com/MarvNC
-// @version      0.18
+// @version      0.19
 // @description  A userscript for exporting a MangaDex list to a .xml file for import to anime list sites.
 // @author       Marv
 // @match        https://mangadex.org/list*
@@ -9,6 +9,7 @@
 // @downloadURL  https://raw.githubusercontent.com/MarvNC/mangadex-list-exporter/master/mangadex-list-exporter.user.js
 // @updateURL    https://raw.githubusercontent.com/MarvNC/mangadex-list-exporter/master/mangadex-list-exporter.user.js
 // @require      https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js
+// @require      http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
 // @grant        none
 // ==/UserScript==
 
@@ -132,7 +133,7 @@ Last updated june 2020
 var getMangaInfo = (id) => {
   return new Promise(async (resolve, reject) => {
     let url = `https://mangadex.org/title/${id}`;
-    let response = await $.get(url).catch((err) => reject(err));
+    let response = await $.get(url);
     let doc = document.createElement('html');
     doc.innerHTML = response;
     // the part with status and rating
