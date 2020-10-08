@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Mangadex List Exporter
 // @namespace    https://github.com/MarvNC
-// @version      0.19
+// @version      0.20
 // @description  A userscript for exporting a MangaDex list to a .xml file for import to anime list sites.
 // @author       Marv
 // @match        https://mangadex.org/list*
@@ -130,83 +130,81 @@ Last updated june 2020
 })();
 
 // accepts id of a manga that is on your manga list
-var getMangaInfo = (id) => {
-  return new Promise(async (resolve, reject) => {
-    let url = `https://mangadex.org/title/${id}`;
-    let response = await $.get(url);
-    let doc = document.createElement('html');
-    doc.innerHTML = response;
-    // the part with status and rating
-    let actions = Array.from(doc.getElementsByClassName('col-lg-3 col-xl-2 strong')).find(
-      (elem) => elem.innerHTML == 'Actions:'
-    );
-    let buttons = actions.parentElement.childNodes[3];
-    let status =
-      actions.parentElement.childNodes[3].childNodes[3].childNodes[0].childNodes[2].innerHTML;
-    let rating = Number.parseInt(buttons.childNodes[5].childNodes[1].innerText.replace(' ', ''));
-    // rating may be NaN if no rating was set, default to 0 instead
-    if (!rating) rating = 0;
+var getMangaInfo = async (id) => {
+  let url = `https://mangadex.org/title/${id}`;
+  let response = await $.get(url);
+  let doc = document.createElement('html');
+  doc.innerHTML = response;
+  // the part with status and rating
+  let actions = Array.from(doc.getElementsByClassName('col-lg-3 col-xl-2 strong')).find(
+    (elem) => elem.innerHTML == 'Actions:'
+  );
+  let buttons = actions.parentElement.childNodes[3];
+  let status =
+    actions.parentElement.childNodes[3].childNodes[3].childNodes[0].childNodes[2].innerHTML;
+  let rating = Number.parseInt(buttons.childNodes[5].childNodes[1].innerText.replace(' ', ''));
+  // rating may be NaN if no rating was set, default to 0 instead
+  if (!rating) rating = 0;
 
-    // reading info
-    let readinginfo = Array.from(doc.getElementsByClassName('col-lg-3 col-xl-2 strong')).find(
-      (elem) => elem.innerHTML == 'Reading progress:'
-    );
-    let ratings = readinginfo.parentElement.childNodes[3].childNodes[1];
-    let volume = Number.parseInt(ratings.childNodes[1].childNodes[1].innerHTML);
-    let chapter = Number.parseInt(ratings.childNodes[3].childNodes[1].innerHTML);
+  // reading info
+  let readinginfo = Array.from(doc.getElementsByClassName('col-lg-3 col-xl-2 strong')).find(
+    (elem) => elem.innerHTML == 'Reading progress:'
+  );
+  let ratings = readinginfo.parentElement.childNodes[3].childNodes[1];
+  let volume = Number.parseInt(ratings.childNodes[1].childNodes[1].innerHTML);
+  let chapter = Number.parseInt(ratings.childNodes[3].childNodes[1].innerHTML);
 
-    // get IDs of various DBs etc.
-    let alID = 0,
-      malID = 0,
-      kitsuID = 0,
-      muID = 0,
-      apSlug = 0;
-    let extLinks = Array.from(doc.getElementsByClassName('col-lg-3 col-xl-2 strong')).find(
-      (elem) => elem.innerHTML == 'Information:'
-    );
-    if (extLinks) {
-      let links = extLinks.parentElement.childNodes[3].childNodes[0];
-      // name: name of the link to find, regex: the regex expression to get desired ID or slug
-      let getLink = (name, regex) => {
-        try {
-          let link = Array.from(links.childNodes).find((elem) => {
-            if (elem.childNodes[2]) return elem.childNodes[2].innerHTML == name;
-          }).childNodes[2].href;
-          let result = regex.exec(link);
-          // return result, or return 0 if no result
-          return result ? result[0] : 0;
-        } catch (err) {
-          return 0;
-        }
-      };
-      // get the IDs of each
-      alID = getLink('AniList', /(?<=manga\/)\d+/);
-      malID = getLink('MyAnimeList', /(?<=manga\/)\d+/);
-      kitsuID = getLink('Kitsu', /(?<=manga\/)\d+/);
-      muID = getLink('MangaUpdates', /(?<=\?id=)\d+/);
-      apSlug = getLink('Anime-Planet', /(?<=\/manga\/)[a-z0-9-]+/);
-    }
+  // get IDs of various DBs etc.
+  let alID = 0,
+    malID = 0,
+    kitsuID = 0,
+    muID = 0,
+    apSlug = 0;
+  let extLinks = Array.from(doc.getElementsByClassName('col-lg-3 col-xl-2 strong')).find(
+    (elem) => elem.innerHTML == 'Information:'
+  );
+  if (extLinks) {
+    let links = extLinks.parentElement.childNodes[3].childNodes[0];
+    // name: name of the link to find, regex: the regex expression to get desired ID or slug
+    let getLink = (name, regex) => {
+      try {
+        let link = Array.from(links.childNodes).find((elem) => {
+          if (elem.childNodes[2]) return elem.childNodes[2].innerHTML == name;
+        }).childNodes[2].href;
+        let result = regex.exec(link);
+        // return result, or return 0 if no result
+        return result ? result[0] : 0;
+      } catch (err) {
+        return 0;
+      }
+    };
+    // get the IDs of each
+    alID = getLink('AniList', /(?<=manga\/)\d+/);
+    malID = getLink('MyAnimeList', /(?<=manga\/)\d+/);
+    kitsuID = getLink('Kitsu', /(?<=manga\/)\d+/);
+    muID = getLink('MangaUpdates', /(?<=\?id=)\d+/);
+    apSlug = getLink('Anime-Planet', /(?<=\/manga\/)[a-z0-9-]+/);
+  }
 
-    let mdID = id;
-    let mangaTitle = doc.getElementsByClassName('card-header d-flex align-items-center py-2')[0]
-      .childNodes[3].innerHTML;
+  let mdID = id;
+  let mangaTitle = doc.getElementsByClassName('card-header d-flex align-items-center py-2')[0]
+    .childNodes[3].innerHTML;
 
-    doc.remove();
+  doc.remove();
 
-    resolve({
-      mangaTitle: mangaTitle,
-      status: status,
-      rating: rating,
-      muID: muID,
-      alID: alID,
-      apSlug: apSlug,
-      kitsuID: kitsuID,
-      malID: malID,
-      mdID: mdID,
-      volume: volume,
-      chapter: chapter,
-    });
-  });
+  return {
+    mangaTitle: mangaTitle,
+    status: status,
+    rating: rating,
+    muID: muID,
+    alID: alID,
+    apSlug: apSlug,
+    kitsuID: kitsuID,
+    malID: malID,
+    mdID: mdID,
+    volume: volume,
+    chapter: chapter,
+  };
 };
 
 // Returns a Promise that resolves after "ms" Milliseconds
