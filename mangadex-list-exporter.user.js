@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Mangadex List Exporter
 // @namespace    https://github.com/MarvNC
-// @version      0.20
+// @version      0.21
 // @description  A userscript for exporting a MangaDex list to a .xml file for import to anime list sites.
 // @author       Marv
 // @match        https://mangadex.org/list*
@@ -23,36 +23,14 @@ const DELAY = 1000;
   let save = async () => {
     // disable the button
     btn.onclick = null;
-    // get amount of titles (ex. 'Showing 1 to 100 of 420 titles')
-    let titleCountElem = document.getElementsByClassName('mt-3 text-center');
-    let pages = 1;
-    if (titleCountElem[0]) {
-      pages = /(?<= of )[0-9,]+(?= titles)/.exec(titleCountElem[0].innerHTML)[0];
-      pages = Math.ceil(Number(pages.replace(',', '')) / 100);
-    }
-    // url without the /chapters/2/ or whatever
+
     let userID = /(?<=\/list\/)\d+/.exec(document.URL)[0];
-    // /0/2/ means list: all (completed, reading, dropped, etc) and in sort mode by alphabetical
-    let urlPrefix = `https://mangadex.org/list/${userID}/0/2/`;
-
-    // array of IDs of all the manga on list
-    let IDs = [];
-    // loop through each page of 100 mangas on list
-    for (let i = 1; i <= pages; i++) {
-      console.log(`Getting page ${i} of ${pages} pages`);
-      btn.innerHTML = `Getting page ${i} of ${pages} list pages`;
-      let response = await $.get(urlPrefix + i);
-      let doc = document.createElement('html');
-      doc.innerHTML = response;
-      await timer(DELAY);
-      // get the manga IDs on each page
-      doc.getElementsByClassName('container')[1].childNodes.forEach((node) => {
-        if (node.dataset && node.dataset.id) IDs.push(node.dataset.id);
-      });
-      doc.remove();
-    }
-
+    let url = `https://mangadex.org/api/v2/user/${userID}/followed-manga`;
+    let response = await $.get(url);
+    let IDs = response.data;
+    IDs = Array.from(IDs, (manga) => manga.mangaId);
     console.log(IDs);
+
     // prettier-ignore
     let xml = 
 `<?xml version="1.0" encoding="UTF-8" ?>
@@ -60,7 +38,6 @@ const DELAY = 1000;
 <!--
 Created by Mangadex List Export userscript
 Programmed by Marv
-Last updated june 2020
 -->
 
 <myanimelist>
