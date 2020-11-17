@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Mangadex List Exporter
 // @namespace    https://github.com/MarvNC
-// @version      0.22
+// @version      0.23
 // @description  A userscript for exporting a MangaDex list to a .xml file for import to anime list sites.
 // @author       Marv
 // @match        https://mangadex.org/list*
@@ -9,7 +9,6 @@
 // @downloadURL  https://raw.githubusercontent.com/MarvNC/mangadex-list-exporter/master/mangadex-list-exporter.user.js
 // @updateURL    https://raw.githubusercontent.com/MarvNC/mangadex-list-exporter/master/mangadex-list-exporter.user.js
 // @require      https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js
-// @require      http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
 // @grant        none
 // ==/UserScript==
 
@@ -26,8 +25,8 @@ const DELAY = 1000;
 
     let userID = /(?<=\/list\/)\d+/.exec(document.URL)[0];
     let url = `https://mangadex.org/api/v2/user/${userID}/followed-manga`;
-    let response = await $.get(url);
-    let IDs = response.data;
+    let json = await fetch(url).then((response) => response.json());
+    let IDs = json.data;
     console.log(IDs);
 
     // prettier-ignore
@@ -117,7 +116,9 @@ var getMangaInfo = async (manga) => {
   };
 
   let url = `https://mangadex.org/api/v2/manga/${manga.mangaId}`;
-  let mangaInfo = (await $.get(url)).data;
+
+  let json = await fetch(url).then((response) => response.json());
+  let mangaInfo = json.data;
   let status = statuses[manga.followType];
 
   let muID, alID, apSlug, kitsuID, malID;
