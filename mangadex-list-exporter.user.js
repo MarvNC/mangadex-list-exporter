@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Mangadex List Exporter
 // @namespace    https://github.com/MarvNC
-// @version      0.25
+// @version      0.26
 // @description  A userscript for exporting a MangaDex list to a .xml file for import to anime list sites.
 // @author       Marv
 // @match        https://mangadex.org/list*
@@ -35,7 +35,7 @@ const DELAY = 1000;
 	
 <!--
 Created by Mangadex List Export userscript
-Programmed by Marv
+https://github.com/MarvNC/mangadex-list-exporter
 -->
 
 <myanimelist>
