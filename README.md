@@ -3,7 +3,7 @@
  A userscript for exporting a MangaDex list to a .xml file for import to anime list sites.
  
  ## Usage
- Navigate to your MDList, which can be accessed via the top right menu. Set the list view style to 'simple list' and press the button at the top that reads 'export list.' The export function will take some time to complete, as this script waits for 1 second in between each request for information from MangaDex.
+ Navigate to your MDList, which can be accessed via the top right menu and press the button at the top that reads 'export list.' The export function will take some time to complete, as this script waits for 1 second in between each request for information from MangaDex.
 
  ![simple list](https://i.fiery.me/s5rzu.png)
  
