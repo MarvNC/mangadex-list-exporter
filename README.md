@@ -1,4 +1,4 @@
-### [Install](https://raw.githubusercontent.com/MarvNC/mangadex-list-exporter/master/mangadex-list-exporter.user.js)
+### [Install](https://raw.githubusercontent.com/MarvNC/mangadex-list-exporter/master/mangadex-list-exporter.user.js) (With Violentmonkey or Tampermonkey)
 # mangadex-list-exporter
  A userscript for exporting a MangaDex list to a .xml file for import to anime list sites.
  
