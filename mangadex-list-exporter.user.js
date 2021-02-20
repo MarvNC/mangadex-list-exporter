@@ -98,7 +98,7 @@ https://github.com/MarvNC/mangadex-list-exporter
 
   // the button to add
   var btn = document.createElement('BUTTON');
-  btn.innerHTML = `Click to export list; remember to set view mode to 'Simple list'`;
+  btn.innerHTML = `Click to export list`;
   btn.onclick = save;
   // add the button after user banner
   document.getElementsByClassName('card mb-3')[0].append(btn);
