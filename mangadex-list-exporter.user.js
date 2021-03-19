@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Mangadex List Exporter
 // @namespace    https://github.com/MarvNC
-// @version      0.27
+// @version      0.28
 // @description  A userscript for exporting a MangaDex list to a .xml file for import to anime list sites.
 // @author       Marv
 // @match        https://mangadex.org/list*
@@ -14,6 +14,7 @@
 
 // 1000ms delay between requests for MangaDex
 const DELAY = 1000;
+const apiURL = 'https://api.mangadex.org/v2/';
 
 (function () {
   'use strict';
@@ -24,7 +25,7 @@ const DELAY = 1000;
     btn.onclick = null;
 
     let userID = /(?<=\/list\/)\d+/.exec(document.URL)[0];
-    let url = `https://mangadex.org/api/v2/user/${userID}/followed-manga`;
+    let url = apiURL + `user/${userID}/followed-manga`;
     let json = await fetch(url, {
       credentials: 'include',
     }).then((response) => response.json());
@@ -117,7 +118,7 @@ var getMangaInfo = async (manga) => {
     6: 'Re-reading',
   };
 
-  let url = `https://mangadex.org/api/v2/manga/${manga.mangaId}`;
+  let url = apiURL + `manga/${manga.mangaId}`;
 
   let json = await fetch(url).then((response) => response.json());
   let mangaInfo = json.data;
