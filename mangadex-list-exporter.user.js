@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Mangadex List Exporter
 // @namespace    https://github.com/MarvNC
-// @version      0.28
+// @version      0.29
 // @description  A userscript for exporting a MangaDex list to a .xml file for import to anime list sites.
 // @author       Marv
 // @match        https://mangadex.org/list*
@@ -24,8 +24,7 @@ const apiURL = 'https://api.mangadex.org/v2/';
     // disable the button
     btn.onclick = null;
 
-    let userID = /(?<=\/list\/)\d+/.exec(document.URL)[0];
-    let url = apiURL + `user/${userID}/followed-manga`;
+    let url = apiURL + 'user/me/followed-manga';
     let json = await fetch(url, {
       credentials: 'include',
     }).then((response) => response.json());
